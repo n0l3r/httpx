@@ -1,4 +1,15 @@
-# httpx
+<p align="center">
+  <img src="logo.svg" alt="httpx" width="520"/>
+</p>
+
+<p align="center">
+  <a href="https://pkg.go.dev/github.com/n0l3r/httpx"><img src="https://pkg.go.dev/badge/github.com/n0l3r/httpx.svg" alt="Go Reference"/></a>
+  <a href="https://github.com/n0l3r/httpx/releases/tag/v0.1.0"><img src="https://img.shields.io/badge/version-v0.1.0-7c3aed" alt="version"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-00d4ff" alt="license"/></a>
+  <img src="https://img.shields.io/badge/go-1.24+-00d4ff" alt="go version"/>
+</p>
+
+---
 
 Production-grade, feature-rich HTTP client library for Go.
 

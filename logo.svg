@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="520" height="160">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f1117;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1d2e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e2e8f0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#94a3b8;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="520" height="160" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Border -->
+  <rect width="520" height="160" rx="16" fill="none" stroke="url(#accentGrad)" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Lightning bolt icon -->
+  <g transform="translate(36, 30)" filter="url(#glow)">
+    <polygon points="26,0 10,44 22,44 14,100 42,36 28,36 38,0" fill="url(#accentGrad)" opacity="0.95"/>
+  </g>
+
+  <!-- httpx text -->
+  <text x="106" y="100" font-family="'SF Mono', 'Fira Code', 'Consolas', monospace" font-size="64" font-weight="700" letter-spacing="-2" fill="url(#textGrad)" filter="url(#glow)">httpx</text>
+
+  <!-- Tagline -->
+  <text x="107" y="128" font-family="'SF Mono', 'Fira Code', 'Consolas', monospace" font-size="14" fill="#64748b" letter-spacing="2">production-grade http client · go</text>
+
+  <!-- Decorative dots top-right -->
+  <circle cx="476" cy="24" r="3" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="492" cy="24" r="3" fill="#7c3aed" opacity="0.4"/>
+  <circle cx="508" cy="24" r="3" fill="#00d4ff" opacity="0.4"/>
+
+  <!-- Decorative line bottom -->
+  <line x1="107" y1="138" x2="420" y2="138" stroke="url(#accentGrad)" stroke-width="1" opacity="0.3"/>
+</svg>
