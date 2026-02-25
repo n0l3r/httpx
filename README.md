@@ -12,7 +12,7 @@ go get github.com/n0l3r/httpx
 
 | Category | Features |
 |---|---|
-| 🧱 Core | Configurable client, context support, fluent request builder, response wrapper, JSON helpers, custom errors, mockable interface, functional options |
+| 🧱 Core | Configurable client, context support, fluent request builder, response wrapper, JSON helpers, form/multipart upload, custom errors, mockable interface, functional options |
 | 🚀 Production | Retry (by error / status), exponential backoff + jitter, logging hook, metrics hook, middleware chain, header injection, correlation ID, body size limiter |
 | 🛡 Reliability | Circuit breaker, rate limiter (global/per-host), singleflight deduplication, TTL response cache, connection pool tuning, auto-gzip, HTTP/2 |
 | 🔐 Security | OAuth 1.0a signing, OAuth 2.0 Bearer token, HMAC request signing, idempotency key |
@@ -104,6 +104,49 @@ req, err := c.NewRequest(ctx, "POST", "/orders").
     Build()
 
 resp, err := c.Do(req)
+```
+
+### Form Upload
+
+```go
+// application/x-www-form-urlencoded
+resp, err := c.Execute(ctx, "POST", "/login",
+    httpx.WithFormBody(url.Values{
+        "username": {"alice"},
+        "password": {"secret"},
+    }),
+)
+```
+
+### Multipart File Upload
+
+```go
+// multipart/form-data
+resp, err := c.Execute(ctx, "POST", "/upload",
+    httpx.WithMultipartBody(
+        map[string]string{"title": "my report"},
+        []httpx.FormFile{
+            {
+                FieldName:   "file",
+                FileName:    "report.pdf",
+                Content:     fileReader,   // any io.Reader
+                ContentType: "application/pdf",
+            },
+        },
+    ),
+)
+```
+
+Or via the fluent builder:
+
+```go
+req, err := c.NewRequest(ctx, "POST", "/upload").
+    BodyMultipart(
+        map[string]string{"title": "photo"},
+        []httpx.FormFile{
+            {FieldName: "avatar", FileName: "me.jpg", Content: imgReader, ContentType: "image/jpeg"},
+        },
+    ).Build()
 ```
 
 ---
