@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -435,5 +436,77 @@ func TestContextCancellation(t *testing.T) {
 	_, err := c.Get(ctx, srv.URL+"/")
 	if err == nil {
 		t.Fatal("expected context cancellation error")
+	}
+}
+
+func TestClientBodyForm(t *testing.T) {
+	srv := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		if got := r.FormValue("username"); got != "alice" {
+			http.Error(w, "unexpected username: "+got, 400)
+			return
+		}
+		ct := r.Header.Get("Content-Type")
+		if ct != "application/x-www-form-urlencoded" {
+			http.Error(w, "unexpected content-type: "+ct, 400)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+	defer srv.Close()
+
+	c, _ := httpx.New()
+	resp, err := c.Execute(context.Background(), "POST", srv.URL+"/login",
+		httpx.WithFormBody(url.Values{"username": {"alice"}, "password": {"secret"}}),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !resp.IsSuccess() {
+		t.Fatalf("expected 200, got %d", resp.StatusCode())
+	}
+}
+
+func TestClientBodyMultipart(t *testing.T) {
+	srv := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(1 << 20); err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		if got := r.FormValue("title"); got != "hello" {
+			http.Error(w, "unexpected title: "+got, 400)
+			return
+		}
+		f, fh, err := r.FormFile("upload")
+		if err != nil {
+			http.Error(w, "missing file: "+err.Error(), 400)
+			return
+		}
+		defer f.Close()
+		if fh.Filename != "test.txt" {
+			http.Error(w, "unexpected filename: "+fh.Filename, 400)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+	defer srv.Close()
+
+	c, _ := httpx.New()
+	resp, err := c.Execute(context.Background(), "POST", srv.URL+"/upload",
+		httpx.WithMultipartBody(
+			map[string]string{"title": "hello"},
+			[]httpx.FormFile{
+				{FieldName: "upload", FileName: "test.txt", Content: strings.NewReader("file content"), ContentType: "text/plain"},
+			},
+		),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !resp.IsSuccess() {
+		t.Fatalf("expected 200, got %d", resp.StatusCode())
 	}
 }

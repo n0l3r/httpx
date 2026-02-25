@@ -354,6 +354,20 @@ func WithRawBody(b []byte, contentType string) RequestOption {
 	}
 }
 
+// WithFormBody encodes fields as application/x-www-form-urlencoded.
+func WithFormBody(fields url.Values) RequestOption {
+	return func(rb *RequestBuilder) {
+		rb.BodyForm(fields)
+	}
+}
+
+// WithMultipartBody builds a multipart/form-data body from text fields and file uploads.
+func WithMultipartBody(fields map[string]string, files []FormFile) RequestOption {
+	return func(rb *RequestBuilder) {
+		rb.BodyMultipart(fields, files)
+	}
+}
+
 // WithQueryParam adds a URL query parameter.
 func WithQueryParam(key, value string) RequestOption {
 	return func(rb *RequestBuilder) {

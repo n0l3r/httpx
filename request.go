@@ -1,13 +1,28 @@
 package httpx
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
 )
+
+// FormFile represents a file field in a multipart form upload.
+type FormFile struct {
+	// FieldName is the form field name (e.g. "avatar").
+	FieldName string
+	// FileName is the filename sent to the server (e.g. "photo.jpg").
+	FileName string
+	// Content is the file content reader.
+	Content io.Reader
+	// ContentType is the MIME type of the file (e.g. "image/jpeg").
+	// Defaults to "application/octet-stream" if empty.
+	ContentType string
+}
 
 // RequestOption is a functional option applied to a RequestBuilder.
 type RequestOption func(*RequestBuilder)
@@ -98,6 +113,57 @@ func (rb *RequestBuilder) BodyBytes(b []byte, contentType string) *RequestBuilde
 // BodyJSON marshals v as JSON and sets it as the request body.
 func (rb *RequestBuilder) BodyJSON(v interface{}) *RequestBuilder {
 	WithJSONBody(v)(rb)
+	return rb
+}
+
+// BodyForm encodes fields as application/x-www-form-urlencoded and sets it as the request body.
+func (rb *RequestBuilder) BodyForm(fields url.Values) *RequestBuilder {
+	rb.body = io.NopCloser(strings.NewReader(fields.Encode()))
+	rb.headers.Set("Content-Type", "application/x-www-form-urlencoded")
+	return rb
+}
+
+// BodyMultipart builds a multipart/form-data body from text fields and file uploads.
+// fields contains plain form values; files contains file attachments (may be nil).
+func (rb *RequestBuilder) BodyMultipart(fields map[string]string, files []FormFile) *RequestBuilder {
+	var buf bytes.Buffer
+	mw := multipart.NewWriter(&buf)
+
+	for k, v := range fields {
+		if err := mw.WriteField(k, v); err != nil {
+			rb.err = fmt.Errorf("httpx: write multipart field %q: %w", k, err)
+			return rb
+		}
+	}
+
+	for _, f := range files {
+		ct := f.ContentType
+		if ct == "" {
+			ct = "application/octet-stream"
+		}
+		h := make(map[string][]string)
+		h["Content-Disposition"] = []string{
+			fmt.Sprintf(`form-data; name="%s"; filename="%s"`, f.FieldName, f.FileName),
+		}
+		h["Content-Type"] = []string{ct}
+		part, err := mw.CreatePart(h)
+		if err != nil {
+			rb.err = fmt.Errorf("httpx: create multipart part %q: %w", f.FieldName, err)
+			return rb
+		}
+		if _, err := io.Copy(part, f.Content); err != nil {
+			rb.err = fmt.Errorf("httpx: write multipart file %q: %w", f.FieldName, err)
+			return rb
+		}
+	}
+
+	if err := mw.Close(); err != nil {
+		rb.err = fmt.Errorf("httpx: close multipart writer: %w", err)
+		return rb
+	}
+
+	rb.body = io.NopCloser(&buf)
+	rb.headers.Set("Content-Type", mw.FormDataContentType())
 	return rb
 }
 
