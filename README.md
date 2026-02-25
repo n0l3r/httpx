@@ -458,7 +458,6 @@ httpx/
 | **Rate Limiter** | `httpx.GlobalRateLimiter` / `PerHostRateLimiter` (per-process) | `ratelimit/redis.RateLimiter` (distributed, sliding window) |
 | **Circuit Breaker** | `httpx.SimpleCircuitBreaker` | `breaker/gobreaker.Adapter` (sony/gobreaker with richer state machine) |
 | **Tiered Cache** | `httpx.TieredCache` (in `cache.go`) | `cache/tiered.Cache` (L1 memory + L2 any backend) |
-```
 
 ---
 
@@ -479,10 +478,4 @@ Categories: `basic` · `retry` · `cache` · `circuit-breaker` · `rate-limiter`
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2026 n0l3r
-```
+This project is licensed under the [MIT License](LICENSE) — Copyright (c) 2026 n0l3r.
