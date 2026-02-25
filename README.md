@@ -3,7 +3,7 @@
 Production-grade, feature-rich HTTP client library for Go.
 
 ```
-go get github.com/NTR3667/httpx
+go get github.com/n0l3r/httpx
 ```
 
 ---
@@ -24,7 +24,7 @@ go get github.com/NTR3667/httpx
 ## Quick Start
 
 ```go
-import "github.com/NTR3667/httpx"
+import "github.com/n0l3r/httpx"
 
 c, err := httpx.New(
     httpx.WithBaseURL("https://api.example.com"),
@@ -179,7 +179,7 @@ c, _ := httpx.New(httpx.WithCircuitBreaker(cb))
 ### sony/gobreaker (execute style)
 
 ```go
-import gbadapter "github.com/NTR3667/httpx/breaker/gobreaker"
+import gbadapter "github.com/n0l3r/httpx/breaker/gobreaker"
 import gb "github.com/sony/gobreaker/v2"
 
 adapter := gbadapter.New(gbadapter.Config{
@@ -221,7 +221,7 @@ c, _ := httpx.New(httpx.WithRateLimiter(
 ### Redis (sliding window)
 
 ```go
-import redisrl "github.com/NTR3667/httpx/ratelimit/redis"
+import redisrl "github.com/n0l3r/httpx/ratelimit/redis"
 
 rdb := goredis.NewClient(&goredis.Options{Addr: "localhost:6379"})
 rl := redisrl.New(rdb, redisrl.Config{
@@ -248,7 +248,7 @@ c, _ := httpx.New(httpx.WithCache(cache))
 ### Redis
 
 ```go
-import rediscache "github.com/NTR3667/httpx/cache/redis"
+import rediscache "github.com/n0l3r/httpx/cache/redis"
 
 rdb := goredis.NewClient(&goredis.Options{Addr: "localhost:6379"})
 cache := rediscache.New(rdb, rediscache.Config{
@@ -263,8 +263,8 @@ c, _ := httpx.New(httpx.WithCache(cache))
 
 ```go
 import (
-    rediscache "github.com/NTR3667/httpx/cache/redis"
-    "github.com/NTR3667/httpx/cache/tiered"
+    rediscache "github.com/n0l3r/httpx/cache/redis"
+    "github.com/n0l3r/httpx/cache/tiered"
 )
 
 l1 := httpx.NewMemoryCache(30 * time.Second)      // fast, short TTL
@@ -330,7 +330,7 @@ transport := &auth.IdempotencyTransport{Header: "Idempotency-Key"}
 ## OpenTelemetry Tracing
 
 ```go
-import "github.com/NTR3667/httpx/tracing"
+import "github.com/n0l3r/httpx/tracing"
 
 transport := &tracing.Transport{
     Tracer:     otel.Tracer("my-service"),
@@ -344,7 +344,7 @@ c, _ := httpx.New(httpx.WithTransport(transport))
 ## Testing with Mock Transport
 
 ```go
-import "github.com/NTR3667/httpx/mock"
+import "github.com/n0l3r/httpx/mock"
 
 mt := mock.NewMockTransport().
     OnGet("/users", func(req *http.Request) (*mock.Response, error) {
@@ -462,6 +462,27 @@ httpx/
 
 ---
 
+## Examples
+
+See **[httpx-example](https://github.com/n0l3r/httpx-example)** for a dedicated repository with runnable examples covering every feature:
+
+```bash
+git clone https://github.com/n0l3r/httpx-example
+cd httpx-example
+go run main.go           # run all categories
+go run main.go retry     # run a specific category
+```
+
+Categories: `basic` · `retry` · `cache` · `circuit-breaker` · `rate-limiter` · `middleware` · `auth` · `tracing` · `singleflight` · `mock`
+
+---
+
 ## License
 
-MIT
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2026 n0l3r
+```
